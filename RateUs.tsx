@@ -24,7 +24,6 @@ const RateUs = ({
   goodRatingUrl,
 }: RateUsProps) => {
   const [runCount, setRunCount] = useState(0);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
   // Load data from AsyncStorage
   useEffect(() => {
@@ -38,9 +37,6 @@ const RateUs = ({
 
   // Increment runCount when app state changes to active
   useEffect(() => {
-    if (!dataLoaded) {
-      return;
-    }
     // If runCount is less than 0, it means do not show prompt anymore
     // If runCount is greater than countToShow, no need to increment anymore
     if (runCount < 0 || runCount > countToShow) {
@@ -48,7 +44,7 @@ const RateUs = ({
     }
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === "active") {
-        setRunCount((prevCount) => prevCount + 1);
+        if (runCount > 0) setRunCount((prevCount) => prevCount + 1);
       }
     };
     const subscription = AppState.addEventListener(
@@ -64,12 +60,13 @@ const RateUs = ({
     const savedCount = await AsyncStorage.getItem("runCount");
     if (savedCount !== null) {
       setRunCount(parseInt(savedCount, 10) + 1);
-      setDataLoaded(true);
+    } else {
+      setRunCount(1);
     }
   };
 
   const saveData = async () => {
-    await AsyncStorage.setItem("runCount", runCount.toString());
+    if (runCount > 0) await AsyncStorage.setItem("runCount", runCount.toString());
   };
 
   const handleStarPress = (rating: number) => {
