@@ -64,6 +64,7 @@ const RateUs = ({
     const savedCount = await AsyncStorage.getItem("runCount");
     if (savedCount !== null) {
       setRunCount(parseInt(savedCount, 10));
+      setDataLoaded(true);
     }
   };
 
