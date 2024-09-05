@@ -66,9 +66,10 @@ const RateUs = ({
   };
 
   const saveData = async () => {
-    if (runCount > 0) {
-      await AsyncStorage.setItem("runCount", runCount.toString());
-    }
+    if (runCount === 0) {
+      return;
+    } 
+    await AsyncStorage.setItem("runCount", runCount.toString());
   };
 
   const handleStarPress = (rating: number) => {
