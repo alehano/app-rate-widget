@@ -31,6 +31,7 @@ const RateUs = ({
   }, []);
 
   // Save data to AsyncStorage
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     saveData();
   }, [runCount]);
@@ -54,23 +55,31 @@ const RateUs = ({
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [countToShow, runCount]);
 
   const loadData = async () => {
     const savedCount = await AsyncStorage.getItem("runCount");
-    if (savedCount !== null) {
-      setRunCount(parseInt(savedCount, 10) + 1);
-    } else {
+    if (savedCount == null) {
       setRunCount(1);
+      return;
+    }
+    const count = Number.parseInt(savedCount, 10);
+    if (count >= 0) {
+      setRunCount(count + 1);
     }
   };
 
   const saveData = async () => {
     if (runCount === 0) {
       return;
-    } 
-    await AsyncStorage.setItem("runCount", runCount.toString());
+    }
+    try {
+      await AsyncStorage.setItem("runCount", runCount.toString());
+    } catch (error) {
+      console.error("Failed to save runCount to AsyncStorage", error);
+    }
   };
+  
 
   const handleStarPress = (rating: number) => {
     setRunCount(-1);
